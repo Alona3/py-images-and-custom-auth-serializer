@@ -8,6 +8,12 @@ import uuid
 from django.contrib.auth.models import AbstractUser
 
 
+def movie_image_file_path(instance, filename):
+    ext = os.path.splitext(filename)[1]
+    filename = f"{slugify(instance.title)}-{uuid.uuid4()}{ext}"
+    return os.path.join("uploads/movies/", filename)
+
+
 class CinemaHall(models.Model):
     name = models.CharField(max_length=255)
     rows = models.IntegerField()
@@ -46,17 +52,13 @@ class Movie(models.Model):
     duration = models.IntegerField()
     genres = models.ManyToManyField(Genre)
     actors = models.ManyToManyField(Actor)
+    image = models.ImageField(upload_to=movie_image_file_path, null=True, blank=True)
 
     class Meta:
         ordering = ["title"]
 
     def __str__(self):
-        return self.title
-    
-    def movie_image_file_path(instance, filename):
-        ext = os.path.splitext(filename)[1]
-        filename = f"{slugify(instance.title)}-{uuid.uuid4()}{ext}"
-        return os.path.join("uploads/movies/", filename)
+        return self.title 
 
 
 class MovieSession(models.Model):
