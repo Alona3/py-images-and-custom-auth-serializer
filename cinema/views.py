@@ -111,9 +111,13 @@ class MovieViewSet(
     @action(methods=["POST"], detail=True, url_path="upload-image", parser_classes=[MultiPartParser])
     def upload_image(self, request, pk=None):
         movie = self.get_object()
-        movie.image = request.FILES.get("image")
+        image_file = request.FILES.get("image")
+        if not image_file:
+            return Response({"error": "No image provided"}, status=status.HTTP_400_BAD_REQUEST)
+
+        movie.image = image_file
         movie.save()
-        return Response({"image": movie.image.url}, status=status.HTTP_200_OK)
+        return Response({"image": movie.image.url}, status=status.HTTP_200_OK)    
 
 
 class MovieSessionViewSet(viewsets.ModelViewSet):
